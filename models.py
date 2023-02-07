@@ -57,10 +57,17 @@ class User(db.Model):
         db.Text,
         default="default-pic.png",
     )
-
+    image_filename = db.Column(
+        db.Text,
+        default="",
+    )
     header_image_url = db.Column(
         db.Text,
         default="default-pic.png"
+    )
+    header_image_filename = db.Column(
+        db.Text,
+        default=""
     )
 
     bio = db.Column(
@@ -83,12 +90,12 @@ class User(db.Model):
     def update(self, form):
         self.username = form.username.data,
         self.email = form.email.data,
-        self.image_url = form.image_url.filename,
-        self.header_image_url = form.header_image_url.filename,
+        self.image_url = form.image_url.url,
+        self.image_filename = form.image_url.filename,
         self.bio = form.bio.data
 
     @classmethod
-    def signup(cls, username, email, password, image_url, header_image_url):
+    def signup(cls, username, email, password, image_url, image_filename):
         """Sign up user. Hashes password and adds user to system"""
 
         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
@@ -98,7 +105,7 @@ class User(db.Model):
             email=email,
             password=hashed_pwd,
             image_url=image_url,
-            header_image_url=header_image_url
+            image_filename=image_filename
         )
 
         db.session.add(user)
@@ -132,3 +139,29 @@ class Recipe(db.Model):
     title = db.Column(db.String(), nullable=False)
     image_url = db.Column(db.Text, nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
+
+
+class Rating(db.Model):
+    """Mapping user likes to warbles."""
+
+    __tablename__ = 'rating'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete='cascade')
+    )
+
+    recipe_id = db.Column(
+        db.Integer,
+        db.ForeignKey('recipes.spoonacular_id', ondelete='cascade'),
+        unique=True
+    )
+    rating = db.Column(
+        db.Integer,
+        nullable=False,
+    )

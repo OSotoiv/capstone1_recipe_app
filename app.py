@@ -1,19 +1,17 @@
-import os
-from flask import Flask, request, render_template, redirect, flash, session, jsonify, g
-import requests
-from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Cookbook, Recipe
-from form import SearchByIngredientsForm, UserAddForm, LoginForm, UserUpdateForm, ComplexForm
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql.expression import func
-from env_keys.env_secrets import APP_CONFIG_KEY
+from flask_caching import Cache
+from helpers import save_user_images, update_user_images, remove_img_from_azuer
 from search_by import search_api_complex, search_api_by_ingredients, search_api_for_instructions, search_api_random_recipe
-from helpers import save_user_images, update_user_images
-
+from env_keys.env_secrets import APP_CONFIG_KEY
+from sqlalchemy.sql.expression import func
+from sqlalchemy.exc import IntegrityError
+from form import SearchByIngredientsForm, UserAddForm, LoginForm, UserUpdateForm, ComplexForm
+from models import db, connect_db, User, Cookbook, Recipe
+from flask_debugtoolbar import DebugToolbarExtension
+import requests
+from flask import Flask, request, render_template, redirect, flash, session, jsonify, g
+import os
 
 CURR_USER_KEY = "curr_user"
-UPLOAD_FOLDER = 'static/profile_imgs'
-
 
 app = Flask(__name__)
 app.app_context().push()
@@ -22,7 +20,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = APP_CONFIG_KEY
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['CACHE_TYPE'] = "SimpleCache"
+app.config['CACHE_DEFAULT_TIMEOUT'] = 300
+
+
+cache = Cache(app)
 
 debug = DebugToolbarExtension(app)
 connect_db(app)
@@ -72,14 +74,14 @@ def register():
                 username=form.username.data,
                 password=form.password.data,
                 email=form.email.data,
-                image_url=form.image_url.data.filename if form.image_url.data else User.image_url.default.arg,
-                header_image_url=form.header_image_url.data.filename if form.header_image_url.data else User.header_image_url.default.arg
+                image_url=form.image_url.data.url if form.image_url.data else User.image_url.default.arg,
+                image_filename=form.image_url.data.filename if form.image_url.data else "",
             )
             db.session.commit()
 
         except IntegrityError:
-            os.remove(f'{UPLOAD_FOLDER}/{form.image_url.data.filename}')
-            os.remove(f'{UPLOAD_FOLDER}/{form.header_image_url.data.filename}')
+            # os.remove(f'{UPLOAD_FOLDER}/{form.image_url.data.filename}')
+            # os.remove(f'{UPLOAD_FOLDER}/{form.header_image_url.data.filename}')
             flash("Username already taken", 'danger')
             return render_template('users/register.html', form=form)
 
@@ -127,7 +129,10 @@ def g_user_show(user_id):
         return redirect("/register")
     user = User.query.get_or_404(user_id)
     recipes = user.recipes
-    return render_template('/users/show.html', user=user, recipes=recipes)
+    image_data = cache.get("image_data")
+    if image_data is None:
+        cache.set("image_data", user.image_url, timeout=180)
+    return render_template('/users/show.html', user=user, recipes=recipes, image_data=image_data)
 
 
 @app.route('/users/profile', methods=["GET", "POST"])
@@ -138,6 +143,9 @@ def user_profile():
         return redirect("/login")
     user = User.query.get_or_404(g.user.id)
     form = UserUpdateForm(obj=user)
+    image_data = cache.get("image_data")
+    if image_data is None:
+        cache.set("image_data", user.image_url, timeout=180)
     if form.validate_on_submit():
         if User.authenticate(g.user.username, form.password.data):
             form = update_user_images(form, user)
@@ -147,6 +155,7 @@ def user_profile():
                 db.session.commit()
                 do_login(user)
                 flash('UPDATED!', 'success')
+                cache.set("image_data", user.image_url, timeout=180)
                 return redirect(f"/users/{g.user.id}")
             except:
                 db.session.rollback()
@@ -155,7 +164,7 @@ def user_profile():
 
         else:
             form.password.errors.append('Incorrect Password')
-    return render_template('users/edit.html', form=form, user=user)
+    return render_template('users/edit.html', form=form, user=user, image_data=image_data)
 
 
 @app.route('/users/delete', methods=["POST"])
@@ -170,8 +179,8 @@ def delete_user():
 
     db.session.delete(g.user)
     db.session.commit()
-    os.remove(f'{UPLOAD_FOLDER}/{g.user.image_url}')
-    os.remove(f'{UPLOAD_FOLDER}/{g.user.header_image_url}')
+    if g.user.image_filename:
+        remove_img_from_azuer(g.user.image_filename)
     flash('Sorry to see you go...', 'success')
     return redirect("/register")
 
@@ -202,9 +211,18 @@ def get_random_recipe():
     return render_template('recipes/show_by_random.html', recipes=resp.get('recipes'))
 
 
+@app.route('/search/random/more')
+def get_more_random_recipes():
+    resp = search_api_random_recipe()
+    html = render_template(
+        'recipes/more_show_by_random.html', recipes=resp.get('recipes'))
+    return html
+
+
 @app.route('/search/<int:recipe_id>/instructions', methods=['GET'])
 def start_cooking(recipe_id):
     instructions = search_api_for_instructions(recipe_id)
+    # return jsonify(instructions)
     user_cookbook = [id for id, x in db.session.query(Cookbook.recipe_id, Cookbook.id).filter(
         Cookbook.user_id == g.user.id).all()]
     return render_template('recipes/start_cooking.html', recipe=instructions, user_cookbook=user_cookbook)

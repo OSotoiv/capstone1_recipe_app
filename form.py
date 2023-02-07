@@ -28,7 +28,6 @@ class UserAddForm(FlaskForm):
     email = EmailField('E-mail', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
     image_url = FileField('Profile Image', validators=[allowed_file])
-    header_image_url = FileField('Background Image', validators=[allowed_file])
 
 
 class LoginForm(FlaskForm):

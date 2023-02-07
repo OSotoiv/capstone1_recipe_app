@@ -1,7 +1,7 @@
 /* ====================== General */
 
 body {
-    background-color: #328bc6;
+    background-color: #328bc69c;
 }
 
 body.error-404 {
@@ -162,7 +162,7 @@ nav+.container {
 #profile-avatar {
     border-radius: 100%;
     display: block;
-    margin-left: -15px;
+    margin-left: 15px;
 }
 
 #profile-image {

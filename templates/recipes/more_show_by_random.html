@@ -1,0 +1,15 @@
+{% for recipe in recipes %}
+<div class="card mb-3" style="width: 18rem;">
+    <img class="card-img-top" src="{{recipe.image}}" alt="Card image cap">
+    <div class="card-body">
+        <h5 class="card-title">{{recipe.title}}</h5>
+        <p class="card-text">Ingredients needed:</p>
+        <ul class="text-success font-weight-bold">
+            {% for item in recipe.extendedIngredients%}
+            <li class="font-weight-bold">{{item.name}}</li>
+            {% endfor %}
+        </ul>
+        <a href="/search/{{recipe.id}}/instructions" class="btn btn-primary">Lets Cook!</a>
+    </div>
+</div>
+{% endfor %}

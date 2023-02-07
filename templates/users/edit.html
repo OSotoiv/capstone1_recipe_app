@@ -14,31 +14,15 @@
             {{ field(placeholder=field.label.text, class="form-control") }}
             {% endfor %}
 
-            <h3 class="join-message">Images</h3>
+            <h3 class="join-message">Profile Image</h3>
             <div class="card mb-2" style="width: 80%;">
-                <img src="/static/profile_imgs/{{user.image_url}}" class="card-img-top"
-                    alt="Image for {{ user.username }} profile">
+                <img src="{{user.image_url}}" class="card-img-top" alt="Image for {{ user.username }} profile">
                 <div class="card-body">
                     <h5 class="card-title">{{form.image_url.label.text}}</h5>
                     <small class="fw-bold">Allowed file types: (.txt .pdf .png .jpg .jpeg .gif)</small>
                     {{form.image_url(placeholder=form.image_url.label.text, class="form-control")}}
                     {% if form.image_url.errors %}
                     {% for error in form.image_url.errors %}
-                    <small class="text-danger fw-bold">
-                        {{ error }}
-                    </small>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-            </div>
-            <div class="card mb-2" style="width: 80%;">
-                <img src="/static/profile_imgs/{{user.header_image_url}}" class="card-img-top" alt="user header image">
-                <div class="card-body">
-                    <h5 class="card-title">{{form.header_image_url.label.text}}</h5>
-                    <small class="fw-bold">Allowed file types: (.txt .pdf .png .jpg .jpeg .gif)</small>
-                    {{form.header_image_url(placeholder=form.header_image_url.label.text, class="form-control")}}
-                    {% if form.header_image_url.errors %}
-                    {% for error in form.header_image_url.errors %}
                     <small class="text-danger fw-bold">
                         {{ error }}
                     </small>

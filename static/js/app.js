@@ -45,3 +45,23 @@ async function saveRecipe(e) {
         console.log(error)
     }
 }
+
+const $recipes_view = $('#recipes_view')
+const $more_button = $('#more')
+$more_button.on('click', get_more_random_recipes)
+
+async function get_more_random_recipes(e) {
+    e.preventDefault()
+    // check scroll location for the bottom of the page.
+    // if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+    //     console.log('bottom reached')
+    // make the API call
+    const res = await axios({
+        url: `http://127.0.0.1:5000/search/random/more`,
+        method: "GET",
+    })
+    $recipes_view.append(res.data)
+    // }
+};
+
+// $(window).scroll(get_more_random_recipes);

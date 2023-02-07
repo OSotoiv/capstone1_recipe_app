@@ -1,13 +1,17 @@
 import uuid as uuid
 from werkzeug.utils import secure_filename
-import os
+from env_keys.env_secrets import BLOB_NAME, BLOB_KEY, BLOB_STRING, BLOB_CONTAINER_NAME
+from azure.storage.blob import BlobServiceClient
 UPLOAD_FOLDER = 'static/profile_imgs'
+blob_service_client = BlobServiceClient.from_connection_string(
+    conn_str=BLOB_STRING)
+container_client = blob_service_client.get_container_client(
+    container=BLOB_CONTAINER_NAME)
 
 
 def save_user_images(form):
     """this helper saves images to database then returns the form to create/updata a User"""
     profile_img = form.image_url.data
-    background_img = form.header_image_url.data
 
     # if image_url (users profile pic) not null and file type is allowed
     if profile_img:
@@ -17,41 +21,15 @@ def save_user_images(form):
         db_img_name = str(uuid.uuid1()) + '_' + profile_img_filename
         # change filename on acutual file and save
         profile_img.filename = db_img_name
-        profile_img.save(os.path.join(UPLOAD_FOLDER, db_img_name))
-        form.image_url.data.filename = profile_img.filename
-
-    # if header_image_url not null and file type is allowed
-    if background_img:
-        # make sure file name is secure
-        background_filename = secure_filename(background_img.filename)
-        # unique naming file with uuid
-        db_bg_img_name = str(uuid.uuid1()) + '_' + background_filename
-        # change filename on acutual file and save
-        background_img.filename = db_bg_img_name
-        background_img.save(os.path.join(UPLOAD_FOLDER, db_bg_img_name))
-        form.header_image_url.data.filename = background_img.filename
-
+        blob_client = container_client.get_blob_client(db_img_name)
+        blob_client.upload_blob(profile_img)
+        # profile_img.save(os.path.join(UPLOAD_FOLDER, db_img_name))
+        form.image_url.data.url = blob_client.url
+        form.image_url.data.filename = db_img_name
     return form
 
 
 def update_user_images(form, user):
-    # check if the user is updating the header image
-    background_img = form.header_image_url.data
-    if background_img and background_img != user.header_image_url:
-        # make sure file name is secure
-        background_filename = secure_filename(background_img.filename)
-        # unique naming file with uuid
-        db_bg_img_name = str(uuid.uuid1()) + '_' + background_filename
-        # change filename on acutual file and save
-        background_img.filename = db_bg_img_name
-        background_img.save(os.path.join(UPLOAD_FOLDER, db_bg_img_name))
-        form.header_image_url.filename = background_img.filename
-        try:
-            os.remove(f'{UPLOAD_FOLDER}/{user.header_image_url}')
-        except:
-            print('********')
-    else:
-        form.header_image_url.filename = user.header_image_url
     # check if the user is updating the user image
     profile_img = form.image_url.data
     if profile_img and profile_img != user.image_url:
@@ -61,13 +39,19 @@ def update_user_images(form, user):
         db_img_name = str(uuid.uuid1()) + '_' + profile_img_filename
         # change filename on acutual file and save
         profile_img.filename = db_img_name
-        profile_img.save(os.path.join(UPLOAD_FOLDER, db_img_name))
+        blob_client2 = container_client.get_blob_client(db_img_name)
+        blob_client2.upload_blob(profile_img)
+        # delete old image from azuer
+        if user.image_filename:
+            container_client.delete_blob(user.image_filename)
+        # profile_img.save(os.path.join(UPLOAD_FOLDER, db_img_name))
         form.image_url.filename = profile_img.filename
-        try:
-            os.remove(f'{UPLOAD_FOLDER}/{user.image_url}')
-        except:
-            print('***********')
+        form.image_url.url = blob_client2.url
     else:
-        form.image_url.filename = user.image_url
-
+        form.image_url.filename = user.image_filename
+        form.image_url.url = user.image_url
     return form
+
+
+def remove_img_from_azuer(image):
+    container_client.delete_blob(image)

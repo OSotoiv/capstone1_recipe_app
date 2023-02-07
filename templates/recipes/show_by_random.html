@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center">Showing Random Recipe's</h1>
-    <div class="row justify-content-evenly">
+    <div id="recipes_view" class="row justify-content-evenly">
         {% for recipe in recipes %}
         <div class="card mb-3" style="width: 18rem;">
             <img class="card-img-top" src="{{recipe.image}}" alt="Card image cap">
@@ -18,7 +18,9 @@
             </div>
         </div>
         {% endfor %}
-
     </div>
+    <button id="more" class="btn btn-secondary">
+        Show more
+    </button>
 </div>
 {% endblock %}

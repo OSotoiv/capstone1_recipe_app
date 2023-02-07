@@ -3,11 +3,8 @@
 <div class="container justify-items-center mb-3">
     <div class="row">
         <div class="jumbotron">
-            <div id="recipe-backdrop" class="full-width">
-                <img id='recipe_img' src="{{recipe.image}}">
-            </div>
             <h1 class="display-4">{{recipe.title}}</h1>
-            <p class="lead">{{recipe.summary|safe}}</p>
+            <p class="lead fw-bold">{{recipe.summary|safe}}</p>
             <hr class="my-4">
             <div class="container">
                 <p>Ready In: {{recipe.readyInMinutes}} min</p>
@@ -36,7 +33,7 @@
             <ol>
                 {% for item in recipe.extendedIngredients%}
                 <li id="ingredient">{{item.name.capitalize()}} <ul>
-                        <li>{{item.amount}} {{item.unit}}</li>
+                        <li>{{item.original}}</li>
                     </ul>
                 </li>
                 {% endfor %}
@@ -74,6 +71,11 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
+        <div class="col-6">
+            <h2>{{recipe.title}}</h2>
+            <img id='recipe_img' src="{{recipe.image}}" alt="">
+
         </div>
     </div>
 </div>

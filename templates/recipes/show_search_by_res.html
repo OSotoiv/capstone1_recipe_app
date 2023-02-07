@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center">
-        Showing Recipe's With: {%for ingredient in ingredients%}{{ingredient.upper()}} {%endfor%}
+        Showing Recipe's With: {%for ingredient in ingredients%}{{-ingredient.upper()}} {%endfor%}
         {% if complex %} {{cuisine.upper()}} {{diet.upper()}} {{meal_type.upper()}} {% endif %}
     </h1>
     <div class="row justify-content-evenly">

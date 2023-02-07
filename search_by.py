@@ -23,7 +23,7 @@ def search_api_random_recipe():
     BASE_URL = 'https://api.spoonacular.com/recipes/random'
     res = requests.get(BASE_URL, params={
         'apiKey': API_KEY,
-        'number': 10
+        'number': 8
     })
     return res.json()
 
