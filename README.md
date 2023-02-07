@@ -1,6 +1,6 @@
 # Recipe Finder
 
-Recipe Finder is a web application built using Python and Flask that allows users to search for recipes, save their favorite recipes in a personal cookbook, and even create and share their own recipes.
+Recipe Finder is a web application built using Python and Flask that allows users to search for recipes, save their favorite recipes in a personal cookbook. The recipes all come from [spoonacularAPI](https://spoonacular.com/food-api)
 
 ## Features
 
@@ -14,7 +14,9 @@ Recipe Finder is a web application built using Python and Flask that allows user
 ## Getting Started
 
 1. Clone the repository
-```git clone https://github.com/[username]/recipe-finder.git```
+```git clone https://github.com/OSotoiv/capstone1_recipe_app.git```
+or
+```gh repo clone OSotoiv/capstone1_recipe_app```
 
 2. Install the dependencies
 ```pip install -r requirements.txt```
@@ -24,8 +26,23 @@ Recipe Finder is a web application built using Python and Flask that allows user
 ```export FLASK_APP=app```
 ```flask run```
 
+4. Note that you will need to set your own env_keys folder.
+APP_CONFIG_KEY = 'secretkey'
 
-4. Visit [http://localhost:5000](http://localhost:5000) to use the application.
+API_KEY = 'secretkey'
+
+BLOB_NAME = 'sign up with Azuer to get a blob name'
+
+BLOB_KEY = 'sign up with Azuer to get a blob key'
+
+BLOB_STRING = 'sign up with Azuer to get a blob string'
+
+BLOB_CONTAINER_NAME = 'sign up with Azuer to get a blob container name'
+
+If you dont want to user Azuer you can also save files localy with ```Image_from_WTForm.save(os.path.join(UPLOAD_FOLDER, img_name))```
+If you are unsure how to do this just ask ChatGPT :sunglasses:
+
+1. Visit [http://localhost:5000](http://localhost:5000) to use the application.
 
 ## Contributing
 
@@ -36,4 +53,10 @@ Recipe Finder is a web application built using Python and Flask that allows user
 
 ## Support
 
-If you have any questions or run into any issues, feel free to reach out to us at [example@email.com](mailto:example@email.com).
+If you have any questions or run into any issues, feel free to reach out to me at [Osoto.iv@gmail.com]().
+
+
+## Comming soon....
+1. Testing...
+2. Users functionality for creating your own recipes.
+3. Comments on users recipes.
