@@ -29,7 +29,7 @@ or
 4. Note that you will need to set your own env_keys folder.
 APP_CONFIG_KEY = 'secretkey'
 
-API_KEY = 'secretkey'
+API_KEY = 'sign up with Spoonacular to get your API KEY'
 
 BLOB_NAME = 'sign up with Azuer to get a blob name'
 
