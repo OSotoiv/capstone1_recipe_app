@@ -43,7 +43,11 @@ def update_user_images(form, user):
         blob_client2.upload_blob(profile_img)
         # delete old image from azuer
         if user.image_filename:
-            container_client.delete_blob(user.image_filename)
+            try:
+                container_client.delete_blob(user.image_filename)
+            except Exception as e:
+                print(e)
+
         # profile_img.save(os.path.join(UPLOAD_FOLDER, db_img_name))
         form.image_url.filename = profile_img.filename
         form.image_url.url = blob_client2.url
@@ -54,4 +58,7 @@ def update_user_images(form, user):
 
 
 def remove_img_from_azuer(image):
-    container_client.delete_blob(image)
+    try:
+        container_client.delete_blob(image)
+    except Exception as e:
+        print(e)
