@@ -17,8 +17,8 @@ app = Flask(__name__)
 app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///recipes_app'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = APP_CONFIG_KEY
+# app.config['SQLALCHEMY_ECHO'] = True
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', APP_CONFIG_KEY)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['CACHE_TYPE'] = "SimpleCache"
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300
@@ -26,7 +26,7 @@ app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 
 cache = Cache(app)
 
-debug = DebugToolbarExtension(app)
+# debug = DebugToolbarExtension(app)
 connect_db(app)
 
 
