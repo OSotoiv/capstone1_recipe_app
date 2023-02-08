@@ -1,12 +1,12 @@
 from flask_caching import Cache
 from helpers import save_user_images, update_user_images, remove_img_from_azuer
 from search_by import search_api_complex, search_api_by_ingredients, search_api_for_instructions, search_api_random_recipe
-from env_keys.env_secrets import APP_CONFIG_KEY
+# from env_keys.env_secrets import APP_CONFIG_KEY
 from sqlalchemy.sql.expression import func
 from sqlalchemy.exc import IntegrityError
 from form import SearchByIngredientsForm, UserAddForm, LoginForm, UserUpdateForm, ComplexForm
 from models import db, connect_db, User, Cookbook, Recipe
-from flask_debugtoolbar import DebugToolbarExtension
+# from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from flask import Flask, request, render_template, redirect, flash, session, jsonify, g
 import os
@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 'postgresql:///recipes_app')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', APP_CONFIG_KEY)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "APP_CONFIG_KEY")
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['CACHE_TYPE'] = "SimpleCache"
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300
