@@ -16,7 +16,7 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL', 'postgresql:///recipes_app')
+    'DATABASE_URL', 'postgresql:///recipes_app').replace("://", "ql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "APP_CONFIG_KEY")
@@ -25,10 +25,9 @@ app.config['CACHE_TYPE'] = "SimpleCache"
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 
 
-cache = Cache(app)
-
 # debug = DebugToolbarExtension(app)
 connect_db(app)
+cache = Cache(app)
 
 
 @app.before_request
