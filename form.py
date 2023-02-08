@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from wtforms import StringField, EmailField, PasswordField, FieldList, TextAreaField, RadioField, SelectField
-from wtforms.validators import InputRequired, ValidationError, DataRequired, Length, Email, Regexp
+from wtforms import StringField, EmailField, PasswordField, FieldList, TextAreaField, SelectField
+from wtforms.validators import ValidationError, DataRequired, Length
 
 
 class MessageForm(FlaskForm):

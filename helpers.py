@@ -1,12 +1,13 @@
 import uuid as uuid
+import os
 from werkzeug.utils import secure_filename
 from env_keys.env_secrets import BLOB_NAME, BLOB_KEY, BLOB_STRING, BLOB_CONTAINER_NAME
 from azure.storage.blob import BlobServiceClient
 UPLOAD_FOLDER = 'static/profile_imgs'
 blob_service_client = BlobServiceClient.from_connection_string(
-    conn_str=BLOB_STRING)
+    conn_str=os.environ.get('BLOB_STRING', BLOB_STRING))
 container_client = blob_service_client.get_container_client(
-    container=BLOB_CONTAINER_NAME)
+    container=os.environ.get('BLOB_CONTAINER_NAME', BLOB_CONTAINER_NAME))
 
 
 def save_user_images(form):
