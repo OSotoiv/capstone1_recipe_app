@@ -1,4 +1,4 @@
-from flask_caching import Cache
+
 from helpers import save_user_images, update_user_images, remove_img_from_azuer
 from search_by import search_api_complex, search_api_by_ingredients, search_api_for_instructions, search_api_random_recipe
 # from env_keys.env_secrets import APP_CONFIG_KEY
@@ -17,16 +17,11 @@ app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 'postgresql:///recipes_app').replace("://", "ql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SQLALCHEMY_ECHO'] = True
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "APP_CONFIG_KEY")
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['CACHE_TYPE'] = "SimpleCache"
-app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 
-
-# debug = DebugToolbarExtension(app)
 connect_db(app)
-cache = Cache(app)
 
 
 @app.before_request
@@ -128,10 +123,7 @@ def g_user_show(user_id):
         return redirect("/register")
     user = User.query.get_or_404(user_id)
     recipes = user.recipes
-    image_data = cache.get("image_data")
-    if image_data is None:
-        cache.set("image_data", user.image_url, timeout=180)
-    return render_template('/users/show.html', user=user, recipes=recipes, image_data=image_data)
+    return render_template('/users/show.html', user=user, recipes=recipes)
 
 
 @app.route('/users/profile', methods=["GET", "POST"])
@@ -142,9 +134,6 @@ def user_profile():
         return redirect("/login")
     user = User.query.get_or_404(g.user.id)
     form = UserUpdateForm(obj=user)
-    image_data = cache.get("image_data")
-    if image_data is None:
-        cache.set("image_data", user.image_url, timeout=180)
     if form.validate_on_submit():
         if User.authenticate(g.user.username, form.password.data):
             form = update_user_images(form, user)
@@ -154,7 +143,7 @@ def user_profile():
                 db.session.commit()
                 do_login(user)
                 flash('UPDATED!', 'success')
-                cache.set("image_data", user.image_url, timeout=180)
+
                 return redirect(f"/users/{g.user.id}")
             except:
                 db.session.rollback()
@@ -163,7 +152,7 @@ def user_profile():
 
         else:
             form.password.errors.append('Incorrect Password')
-    return render_template('users/edit.html', form=form, user=user, image_data=image_data)
+    return render_template('users/edit.html', form=form, user=user)
 
 
 @app.route('/users/delete', methods=["POST"])
