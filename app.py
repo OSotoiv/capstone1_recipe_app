@@ -6,7 +6,6 @@ from sqlalchemy.sql.expression import func
 from sqlalchemy.exc import IntegrityError
 from form import SearchByIngredientsForm, UserAddForm, LoginForm, UserUpdateForm, ComplexForm
 from models import db, connect_db, User, Cookbook, Recipe
-# from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from flask import Flask, request, render_template, redirect, flash, session, jsonify, g
 import os
