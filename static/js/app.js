@@ -3,6 +3,7 @@ $save_recipe.on('click', saveRecipe)
 const $saved_or_not = $('#saved_or_not')
 const recipe_img = $('#recipe_img')
 const ingredients_list = document.querySelectorAll('#ingredient')
+const BASEURL = 'https://recipes-app-capstone.herokuapp.com'
 function sayhi(e) {
     e.preventDefault;
     console.log('hi')
@@ -15,7 +16,7 @@ async function saveRecipe(e) {
     ingredients_list.forEach((item) => ingredients_text.push(item.innerText))
     try {
         const res = await axios({
-            url: `http://127.0.0.1:5000/save_recipe/${recipe_id}/${recipe_title}`,
+            url: `${BASEURL}/${recipe_id}/${recipe_title}`,
             method: "POST",
             data: { ingredients: ingredients_text, image: recipe_img[0].src }
         })
@@ -57,7 +58,7 @@ async function get_more_random_recipes(e) {
     //     console.log('bottom reached')
     // make the API call
     const res = await axios({
-        url: `http://127.0.0.1:5000/search/random/more`,
+        url: `${BASEURL}/search/random/more`,
         method: "GET",
     })
     $recipes_view.append(res.data)
