@@ -16,7 +16,7 @@ async function saveRecipe(e) {
     ingredients_list.forEach((item) => ingredients_text.push(item.innerText))
     try {
         const res = await axios({
-            url: `${BASEURL}/${recipe_id}/${recipe_title}`,
+            url: `${BASEURL}/save_recipe/${recipe_id}/${recipe_title}`,
             method: "POST",
             data: { ingredients: ingredients_text, image: recipe_img[0].src }
         })
