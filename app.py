@@ -136,8 +136,8 @@ def user_profile():
     form = UserUpdateForm(obj=user)
     if form.validate_on_submit():
         if User.authenticate(g.user.username, form.password.data):
-            form = update_user_images(form, user)
             try:
+                form = update_user_images(form, user)
                 # bug: 01
                 user.update(form)
                 db.session.commit()
@@ -147,6 +147,7 @@ def user_profile():
                 return redirect(f"/users/{g.user.id}")
             except:
                 db.session.rollback()
+                flash('something went wrong!', 'danger')
                 form.username.errors.append('Username/Email already exist')
                 return render_template('users/edit.html', form=form, user=user)
 
