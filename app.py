@@ -61,8 +61,8 @@ def register():
     form = UserAddForm()
 
     if form.validate_on_submit():
-        form = save_user_images(form)
         try:
+            form = save_user_images(form)
             user = User.signup(
                 username=form.username.data,
                 password=form.password.data,

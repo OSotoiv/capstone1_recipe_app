@@ -18,14 +18,20 @@ def save_user_images(form):
         db_img_name = str(uuid.uuid1()) + '_' + profile_img_filename
         # change filename on acutual file and save
         profile_img.filename = db_img_name
-        blob_client = BlobClient.from_connection_string(
-            conn_str=os.environ.get('BLOB_STRING', "BLOB_STRING"),
-            container_name=os.environ.get(
-                'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
-            blob_name=db_img_name,
-            credential=os.environ.get('BLOB_CON_SAS_TOKEN', "BLOB_CON_SAS_TOKEN"))
-
-        blob_client.upload_blob(profile_img)
+        try:
+            blob_client = BlobClient.from_connection_string(
+                conn_str=os.environ.get('BLOB_STRING', "BLOB_STRING"),
+                container_name=os.environ.get(
+                    'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
+                blob_name=db_img_name,
+                credential=os.environ.get('BLOB_CON_SAS_TOKEN', "BLOB_CON_SAS_TOKEN"))
+            blob_client.upload_blob(profile_img)
+        except Exception as e:
+            print(e)
+            form.image_url.data.url = ""
+            form.image_url.data.filename = ""
+            form.image_url.data = ""
+            return form
         # profile_img.save(os.path.join(UPLOAD_FOLDER, db_img_name))
         form.image_url.data.url = blob_client.url
         form.image_url.data.filename = db_img_name
