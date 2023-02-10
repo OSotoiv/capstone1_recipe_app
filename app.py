@@ -17,7 +17,6 @@ app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 'postgresql:///recipes_app').replace("://", "ql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "APP_CONFIG_KEY")
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
@@ -76,6 +75,7 @@ def register():
         except IntegrityError:
             # os.remove(f'{UPLOAD_FOLDER}/{form.image_url.data.filename}')
             # os.remove(f'{UPLOAD_FOLDER}/{form.header_image_url.data.filename}')
+            db.session.rollback()
             flash("Username already taken", 'danger')
             return render_template('users/register.html', form=form)
 

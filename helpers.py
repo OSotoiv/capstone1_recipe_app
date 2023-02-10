@@ -1,13 +1,9 @@
 import uuid as uuid
 import os
 from werkzeug.utils import secure_filename
-from azure.storage.blob import BlobServiceClient, BlobClient
+from azure.storage.blob import BlobClient, ContainerClient
+# from env_keys.env_secrets import BLOB_CONTAINER_NAME, BLOB_STRING, BLOB_CON_SAS_TOKEN
 UPLOAD_FOLDER = 'static/profile_imgs'
-blob_service_client = BlobServiceClient.from_connection_string(
-    conn_str=os.environ.get('BLOB_STRING'),
-    credential=os.environ.get('BLOB_SAS_URL'))
-container_client = blob_service_client.get_container_client(
-    container=os.environ.get('BLOB_CONTAINER_NAME'))
 
 
 def save_user_images(form):
@@ -22,7 +18,12 @@ def save_user_images(form):
         db_img_name = str(uuid.uuid1()) + '_' + profile_img_filename
         # change filename on acutual file and save
         profile_img.filename = db_img_name
-        blob_client = container_client.get_blob_client(db_img_name)
+        blob_client = BlobClient.from_connection_string(
+            conn_str=os.environ.get('BLOB_STRING', "BLOB_STRING"),
+            container_name=os.environ.get(
+                'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
+            blob_name=db_img_name,
+            credential=os.environ.get('BLOB_SAS_URL', "BLOB_CON_SAS_TOKEN"))
         blob_client.upload_blob(profile_img)
         # profile_img.save(os.path.join(UPLOAD_FOLDER, db_img_name))
         form.image_url.data.url = blob_client.url
@@ -40,11 +41,21 @@ def update_user_images(form, user):
         db_img_name = str(uuid.uuid1()) + '_' + profile_img_filename
         # change filename on acutual file and save
         profile_img.filename = db_img_name
-        blob_client2 = container_client.get_blob_client(db_img_name)
+        blob_client2 = BlobClient.from_connection_string(
+            conn_str=os.environ.get('BLOB_STRING', "BLOB_STRING"),
+            container_name=os.environ.get(
+                'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
+            blob_name=db_img_name,
+            credential=os.environ.get('BLOB_SAS_URL', "BLOB_CON_SAS_TOKEN"))
         blob_client2.upload_blob(profile_img)
         # delete old image from azuer
         if user.image_filename:
             try:
+                container_client = ContainerClient.from_connection_string(
+                    conn_str=os.environ.get('BLOB_STRING', "BLOB_STRING"),
+                    container_name=os.environ.get(
+                        'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
+                    credential=os.environ.get('BLOB_SAS_URL', "BLOB_CON_SAS_TOKEN"))
                 container_client.delete_blob(user.image_filename)
             except Exception as e:
                 print(e)
@@ -60,6 +71,12 @@ def update_user_images(form, user):
 
 def remove_img_from_azuer(image):
     try:
+        container_client = ContainerClient.from_connection_string(
+            conn_str=os.environ.get('BLOB_STRING', "BLOB_STRING"),
+            container_name=os.environ.get(
+                'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
+            credential=os.environ.get('BLOB_SAS_URL', "BLOB_CON_SAS_TOKEN"))
+
         container_client.delete_blob(image)
     except Exception as e:
         print(e)
