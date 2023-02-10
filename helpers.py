@@ -46,7 +46,7 @@ def update_user_images(form, user):
             container_name=os.environ.get(
                 'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
             blob_name=db_img_name,
-            credential=os.environ.get('BLOB_SAS_URL', "BLOB_CON_SAS_TOKEN"))
+            credential=os.environ.get('BLOB_CON_SAS_TOKEN', "BLOB_CON_SAS_TOKEN"))
         blob_client2.upload_blob(profile_img)
         # delete old image from azuer
         if user.image_filename:
