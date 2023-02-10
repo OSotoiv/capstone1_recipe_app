@@ -23,7 +23,7 @@ def save_user_images(form):
             container_name=os.environ.get(
                 'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
             blob_name=db_img_name,
-            credential=os.environ.get('BLOB_SAS_URL', "BLOB_CON_SAS_TOKEN"))
+            credential=os.environ.get('BLOB_CON_SAS_TOKEN', "BLOB_CON_SAS_TOKEN"))
         blob_client.upload_blob(profile_img)
         # profile_img.save(os.path.join(UPLOAD_FOLDER, db_img_name))
         form.image_url.data.url = blob_client.url
@@ -55,7 +55,7 @@ def update_user_images(form, user):
                     conn_str=os.environ.get('BLOB_STRING', "BLOB_STRING"),
                     container_name=os.environ.get(
                         'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
-                    credential=os.environ.get('BLOB_SAS_URL', "BLOB_CON_SAS_TOKEN"))
+                    credential=os.environ.get('BLOB_CON_SAS_TOKEN', "BLOB_CON_SAS_TOKEN"))
                 container_client.delete_blob(user.image_filename)
             except Exception as e:
                 print(e)
@@ -75,7 +75,7 @@ def remove_img_from_azuer(image):
             conn_str=os.environ.get('BLOB_STRING', "BLOB_STRING"),
             container_name=os.environ.get(
                 'BLOB_CONTAINER_NAME', "BLOB_CONTAINER_NAME"),
-            credential=os.environ.get('BLOB_SAS_URL', "BLOB_CON_SAS_TOKEN"))
+            credential=os.environ.get('BLOB_CON_SAS_TOKEN', "BLOB_CON_SAS_TOKEN"))
 
         container_client.delete_blob(image)
     except Exception as e:
